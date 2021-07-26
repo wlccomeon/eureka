@@ -101,6 +101,11 @@ public class DefaultEurekaServerConfig implements EurekaServerConfig {
         init();
     }
 
+    /**
+     * 初始化配置文件中的内容
+     * 获取eureka-server.properties文件中的内容
+     * (如果有多环境，如eureka-server-test.properties，则test文件中的内容会替换掉原文件中的相同key的内容)
+     */
     private void init() {
         String env = ConfigurationManager.getConfigInstance().getString(
                 EUREKA_ENVIRONMENT, TEST);

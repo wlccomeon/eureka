@@ -44,6 +44,7 @@ public class StatusFilter implements Filter {
      *
      * @see javax.servlet.Filter#destroy()
      */
+    @Override
     public void destroy() {
         // TODO Auto-generated method stub
 
@@ -55,6 +56,7 @@ public class StatusFilter implements Filter {
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest,
      * javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         InstanceInfo myInfo = ApplicationInfoManager.getInstance().getInfo();
@@ -73,6 +75,7 @@ public class StatusFilter implements Filter {
      *
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
      */
+    @Override
     public void init(FilterConfig arg0) throws ServletException {
     }
 
