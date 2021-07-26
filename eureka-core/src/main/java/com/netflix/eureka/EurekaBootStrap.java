@@ -128,6 +128,7 @@ public class EurekaBootStrap implements ServletContextListener {
     protected void initEurekaEnvironment() throws Exception {
         logger.info("Setting the eureka configuration..");
         //double-check单例模式（com.netflix.config.ConfigurationManager类属于另外一个开源项目:netflix-config）
+        //其中创建的ConcurrentCompositeConfiguration，包括了eureka需要的所有的配置
         String dataCenter = ConfigurationManager.getConfigInstance().getString(EUREKA_DATACENTER);
         //设置自定义的或者默认的数据中心
         if (dataCenter == null) {
@@ -148,7 +149,12 @@ public class EurekaBootStrap implements ServletContextListener {
      * init hook for server context. Override for custom logic.
      */
     protected void initEurekaServerContext() throws Exception {
-        //初始化eureka-server.properties文件内容,并提供get方法
+        //初始化eureka-server.properties文件内容,并提供get方法(不同于我们通过常量的方式获取值，eureka是通过接口方法的形式来对外提供统一的获取配置的方式)
+        //（1）创建了一个DefaultEurekaServerConfig对象
+        //（2）创建DefaultEurekaServerConfig对象的时候，在里面会有一个init方法
+        //（3）先是将eureka-server.properties中的配置加载到了一个Properties对象中，然后将Properties对象中的配置放到ConfigurationManager中去，此时ConfigurationManager中去就有了所有的配置了
+        //（4）然后DefaultEurekaServerConfig提供的获取配置项的各个方法，都是通过硬编码的配置项名称，从DynamicPropertyFactory中获取配置项的值，DynamicPropertyFactory是从ConfigurationManager那儿来的，所以也包含了所有配置项的值
+        //（5）在获取配置项的时候，如果没有配置，那么就会有默认的值，全部属性都是有默认值的
         EurekaServerConfig eurekaServerConfig = new DefaultEurekaServerConfig();
 
         // For backward compatibility
