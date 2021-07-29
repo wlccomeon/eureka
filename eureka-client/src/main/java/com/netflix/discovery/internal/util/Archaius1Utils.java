@@ -21,7 +21,7 @@ public final class Archaius1Utils {
     private static final String EUREKA_ENVIRONMENT = "eureka.environment";
 
     public static DynamicPropertyFactory initConfig(String configName) {
-
+        //懒汉式单例模式获取实例
         DynamicPropertyFactory configInstance = DynamicPropertyFactory.getInstance();
         DynamicStringProperty EUREKA_PROPS_FILE = configInstance.getStringProperty("eureka.client.props", configName);
 
@@ -30,6 +30,7 @@ public final class Archaius1Utils {
 
         String eurekaPropsFile = EUREKA_PROPS_FILE.get();
         try {
+            //读取和加载文件中的配置
             ConfigurationManager.loadCascadedPropertiesFromResources(eurekaPropsFile);
         } catch (IOException e) {
             logger.warn(

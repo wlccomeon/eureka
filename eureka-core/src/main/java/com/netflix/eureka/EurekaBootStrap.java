@@ -149,7 +149,8 @@ public class EurekaBootStrap implements ServletContextListener {
      * init hook for server context. Override for custom logic.
      */
     protected void initEurekaServerContext() throws Exception {
-        //初始化eureka-server.properties文件内容,并提供get方法(不同于我们通过常量的方式获取值，eureka是通过接口方法的形式来对外提供统一的获取配置的方式)
+        //初始化eureka-server.properties文件内容,并提供get方法(
+        // 精华：不同于我们通过常量的方式获取值，eureka是通过接口方法的形式来对外提供统一的获取配置的方式,并且都有默认值)
         //（1）创建了一个DefaultEurekaServerConfig对象
         //（2）创建DefaultEurekaServerConfig对象的时候，在里面会有一个init方法
         //（3）先是将eureka-server.properties中的配置加载到了一个Properties对象中，然后将Properties对象中的配置放到ConfigurationManager中去，此时ConfigurationManager中去就有了所有的配置了
@@ -165,17 +166,20 @@ public class EurekaBootStrap implements ServletContextListener {
         logger.info(eurekaServerConfig.getJsonCodecName());
         ServerCodecs serverCodecs = new DefaultServerCodecs(eurekaServerConfig);
 
+        //此管理器用来管理config和instanceInfo的
         ApplicationInfoManager applicationInfoManager = null;
 
-        //初始化eureka实例配置和eurekaClient
+        //初始化eureka实例配置和eurekaClient，
+        //eurekaServer本身也把自己当做一个eurekaClient，
+        // 因为它也要注册到其他的eurekaServer中来组成一个集群，所以它也是一个应用实例，具有Application、Instance的概念
         if (eurekaClient == null) {
             EurekaInstanceConfig instanceConfig = isCloud(ConfigurationManager.getDeploymentContext())
                     ? new CloudInstanceConfig()
                     : new MyDataCenterInstanceConfig();
-            
+            //初始化instanceInfo和leaseInfo(均使用了构造器模式)，instanceConfig等信息
             applicationInfoManager = new ApplicationInfoManager(
                     instanceConfig, new EurekaConfigBasedInstanceInfoProvider(instanceConfig).get());
-            
+            //初始化eurekaClient的各种默认配置
             EurekaClientConfig eurekaClientConfig = new DefaultEurekaClientConfig();
             eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig);
         } else {

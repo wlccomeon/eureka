@@ -45,6 +45,7 @@ public class EurekaConfigBasedInstanceInfoProvider implements Provider<InstanceI
     @Override
     public synchronized InstanceInfo get() {
         if (instanceInfo == null) {
+            //构造器模式，创建契约信息
             // Build the lease information to be passed to the server based on config
             LeaseInfo.Builder leaseInfoBuilder = LeaseInfo.Builder.newBuilder()
                     .setRenewalIntervalInSecs(config.getLeaseRenewalIntervalInSeconds())
@@ -53,7 +54,7 @@ public class EurekaConfigBasedInstanceInfoProvider implements Provider<InstanceI
             if (vipAddressResolver == null) {
                 vipAddressResolver = new Archaius1VipAddressResolver();
             }
-
+            //构造器模式创建实例信息
             // Builder the instance information to be registered with eureka server
             InstanceInfo.Builder builder = InstanceInfo.Builder.newBuilder(vipAddressResolver);
 
