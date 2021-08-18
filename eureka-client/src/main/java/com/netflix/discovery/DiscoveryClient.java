@@ -342,6 +342,7 @@ public class DiscoveryClient implements EurekaClient {
         transportConfig = config.getTransportConfig();
         instanceInfo = myInfo;
         if (myInfo != null) {
+            //效果类似于ServiceA/001
             appPathIdentifier = instanceInfo.getAppName() + "/" + instanceInfo.getId();
         } else {
             logger.warn("Setting instanceInfo to a passed in null value");

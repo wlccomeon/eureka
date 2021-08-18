@@ -112,6 +112,7 @@ public class EurekaBootStrap implements ServletContextListener {
         try {
             //初始化eureka运行环境
             initEurekaEnvironment();
+            //初始化eureka上下文
             initEurekaServerContext();
 
             ServletContext sc = event.getServletContext();
@@ -150,7 +151,8 @@ public class EurekaBootStrap implements ServletContextListener {
      */
     protected void initEurekaServerContext() throws Exception {
         //初始化eureka-server.properties文件内容,并提供get方法(
-        // 精华：不同于我们通过常量的方式获取值，eureka是通过接口方法的形式来对外提供统一的获取配置的方式,并且都有默认值)
+        // 精华：不同于我们通过常量的方式获取值，eureka是通过接口方法的形式来对外提供统一的获取配置的方式,并且都有默认值,
+        // 这样的好处在于非常容易维护,比直接通过常量的方式好用,毕竟方法名很少修改)
         //（1）创建了一个DefaultEurekaServerConfig对象
         //（2）创建DefaultEurekaServerConfig对象的时候，在里面会有一个init方法
         //（3）先是将eureka-server.properties中的配置加载到了一个Properties对象中，然后将Properties对象中的配置放到ConfigurationManager中去，此时ConfigurationManager中去就有了所有的配置了
@@ -179,13 +181,13 @@ public class EurekaBootStrap implements ServletContextListener {
             //初始化instanceInfo和leaseInfo(均使用了构造器模式)，instanceConfig等信息
             applicationInfoManager = new ApplicationInfoManager(
                     instanceConfig, new EurekaConfigBasedInstanceInfoProvider(instanceConfig).get());
-            //初始化eurekaClient的各种默认配置
+            //初始化eurekaClient的各种默认配置,子类DiscoveryClient作为eurekaClient
             EurekaClientConfig eurekaClientConfig = new DefaultEurekaClientConfig();
             eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig);
         } else {
             applicationInfoManager = eurekaClient.getApplicationInfoManager();
         }
-
+        //感知eureka server集群实例的注册表
         PeerAwareInstanceRegistry registry;
         if (isAws(applicationInfoManager.getInfo())) {
             registry = new AwsInstanceRegistry(
@@ -204,7 +206,7 @@ public class EurekaBootStrap implements ServletContextListener {
                     eurekaClient
             );
         }
-
+        //集群节点
         PeerEurekaNodes peerEurekaNodes = getPeerEurekaNodes(
                 registry,
                 eurekaServerConfig,
@@ -212,7 +214,7 @@ public class EurekaBootStrap implements ServletContextListener {
                 serverCodecs,
                 applicationInfoManager
         );
-
+        //生成和初始化eureka服务上下文，包含eureka的配置信息，集群信息、应用信息、注册表信息等
         serverContext = new DefaultEurekaServerContext(
                 eurekaServerConfig,
                 serverCodecs,
@@ -220,17 +222,18 @@ public class EurekaBootStrap implements ServletContextListener {
                 peerEurekaNodes,
                 applicationInfoManager
         );
-
+        //将上下文赋值给holder，该holder为获取上下文的工具
         EurekaServerContextHolder.initialize(serverContext);
-
         serverContext.initialize();
         logger.info("Initialized server context");
 
         // Copy registry from neighboring eureka node
+        //从相邻的一个eureka server节点拷贝注册表的信息，如果拷贝失败，就找下一个
         int registryCount = registry.syncUp();
         registry.openForTraffic(applicationInfoManager, registryCount);
 
         // Register all monitoring statistics.
+        // 跟eureka自身的监控机制相关联的
         EurekaMonitors.registerAllStats();
     }
     
