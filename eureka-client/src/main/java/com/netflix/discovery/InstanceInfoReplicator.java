@@ -112,12 +112,16 @@ class InstanceInfoReplicator implements Runnable {
         }
     }
 
+
+    @Override
     public void run() {
         try {
             discoveryClient.refreshInstanceInfo();
 
             Long dirtyTimestamp = instanceInfo.isDirtyWithTime();
             if (dirtyTimestamp != null) {
+                //真正的注册的方法入口
+                //这是一个很大的槽点，注册的流程隐藏的太深了，没有在主流程中
                 discoveryClient.register();
                 instanceInfo.unsetIsDirty(dirtyTimestamp);
             }

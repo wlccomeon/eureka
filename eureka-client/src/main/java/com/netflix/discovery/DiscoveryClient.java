@@ -421,6 +421,7 @@ public class DiscoveryClient implements EurekaClient {
             );  // use direct handoff
 
             eurekaTransport = new EurekaTransport();
+            //发送请求这块的方法命名可读性很差
             scheduleServerEndpointTask(eurekaTransport, args);
 
             AzToRegionMapper azToRegionMapper;
@@ -473,6 +474,7 @@ public class DiscoveryClient implements EurekaClient {
             }
         }
 
+        //心跳、集群信息都在这里，在这里面进行了服务注册。。隐藏的太深了
         // finally, init the schedule tasks (e.g. cluster resolvers, heartbeat, instanceInfo replicator, fetch
         initScheduledTasks();
 
@@ -874,6 +876,7 @@ public class DiscoveryClient implements EurekaClient {
         logger.info(PREFIX + "{}: registering service...", appPathIdentifier);
         EurekaHttpResponse<Void> httpResponse;
         try {
+            //执行restful访问的注册方法是在com.netflix.discovery.shared.transport.jersey2.AbstractJersey2EurekaHttpClient.register中
             httpResponse = eurekaTransport.registrationClient.register(instanceInfo);
         } catch (Exception e) {
             logger.warn(PREFIX + "{} - registration failed {}", appPathIdentifier, e.getMessage(), e);
@@ -1358,7 +1361,7 @@ public class DiscoveryClient implements EurekaClient {
             if (clientConfig.shouldOnDemandUpdateStatusChange()) {
                 applicationInfoManager.registerStatusChangeListener(statusChangeListener);
             }
-
+            //最终会调用到InstanceInfoReplicator.run()方法
             instanceInfoReplicator.start(clientConfig.getInitialInstanceInfoReplicationIntervalSeconds());
         } else {
             logger.info("Not registering with Eureka server per configuration");
