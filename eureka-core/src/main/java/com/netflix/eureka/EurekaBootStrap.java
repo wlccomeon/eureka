@@ -187,8 +187,8 @@ public class EurekaBootStrap implements ServletContextListener {
             //eureka client的服务注册，是在DiscoverClient中的InstanceInfoReplicator中的
             //实际发送服务注册请求的是com.netflix.discovery.shared.transport.jersey2.AbstractJersey2EurekaHttpClient.register，发送了一个restful请求
             //调用链：1. com.netflix.discovery.DiscoveryClient.DiscoveryClient(com.netflix.appinfo.ApplicationInfoManager, com.netflix.discovery.EurekaClientConfig, com.netflix.discovery.AbstractDiscoveryClientOptionalArgs, javax.inject.Provider<com.netflix.discovery.BackupRegistry>, com.netflix.discovery.shared.resolver.EndpointRandomizer)
-            //2.
-            //3.
+            //2.com.netflix.discovery.DiscoveryClient.initScheduledTasks
+            //3.com.netflix.discovery.InstanceInfoReplicator.run
             eurekaClient = new DiscoveryClient(applicationInfoManager, eurekaClientConfig);
         } else {
             applicationInfoManager = eurekaClient.getApplicationInfoManager();
