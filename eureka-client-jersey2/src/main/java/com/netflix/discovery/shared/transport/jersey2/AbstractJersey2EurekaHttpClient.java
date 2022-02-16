@@ -249,6 +249,12 @@ public abstract class AbstractJersey2EurekaHttpClient implements EurekaHttpClien
         }
     }
 
+    /**
+     * 通过websocket发起http请求获取Applications
+     * @param urlPath
+     * @param regions
+     * @return
+     */
     private EurekaHttpResponse<Applications> getApplicationsInternal(String urlPath, String[] regions) {
         Response response = null;
         try {

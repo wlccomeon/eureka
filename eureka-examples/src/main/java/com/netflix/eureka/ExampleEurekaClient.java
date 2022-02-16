@@ -117,7 +117,7 @@ public class ExampleEurekaClient {
     public static void main(String[] args) {
         ExampleEurekaClient sampleClient = new ExampleEurekaClient();
 
-        // create the client
+        // create the client ，MyDataCenterInstanceConfig内包含一些默认的配置
         ApplicationInfoManager applicationInfoManager = initializeApplicationInfoManager(new MyDataCenterInstanceConfig());
         EurekaClient client = initializeEurekaClient(applicationInfoManager, new DefaultEurekaClientConfig());
 
